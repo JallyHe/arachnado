@@ -247,7 +247,8 @@ class ArachnadoCrawlerProcess(CrawlerProcess):
             'seed': spider.domain,
             'status': reason,
             'stats': spider.crawler.stats.get_stats(spider),
-            'downloads': self._downloader_stats(spider.crawler)
+            'downloads': self._downloader_stats(spider.crawler),
+            'flags': list(crawler.spider.flags),
         })
 
     # FIXME: methods below are ugly for two reasons:
@@ -265,7 +266,8 @@ class ArachnadoCrawlerProcess(CrawlerProcess):
                 'seed': crawler.spider.domain,
                 'status': self._get_crawler_status(crawler),
                 'stats': crawler.spider.crawler.stats.get_stats(crawler.spider),
-                'downloads': self._downloader_stats(crawler)
+                'downloads': self._downloader_stats(crawler),
+                'flags': list(crawler.spider.flags),
                 # 'engine_info': dict(get_engine_status(crawler.engine))
             }
             for crawler in crawlers

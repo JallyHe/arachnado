@@ -20,3 +20,15 @@ export function pauseCrawl(jobId){
 export function resumeCrawl(jobId){
     $.post(window.RESUME_CRAWL_URL, {job_id: jobId});
 }
+
+export function login(jobId, username, password){
+    $.ajax(window.LOGIN_URL, {
+        type: 'post',
+        contentType: 'application/json',
+        data: JSON.stringify({
+            job_id: jobId,
+            username: username,
+            password: password
+        })
+    });
+}

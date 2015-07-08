@@ -10,6 +10,7 @@ var { ProcessStatsTable } = require("../components/ProcessStats");
 var { JobStats } = require("../components/JobStats");
 var { JobListWidgetVerbose, JobControlButtons } = require("../components/JobList");
 var { ShortTermQueueWidget } = require("../components/JobTransfers.jsx");
+var { LoginCredentials } = require("../components/LoginCredentials.jsx");
 
 
 var ShortJobInfo = React.createClass({
@@ -89,6 +90,9 @@ export var JobPage = React.createClass({
                 </div>
                 <div className="row">
                     <div className="col-lg-5">
+                        <Panel collapsible defaultExpanded header="Login credentials">
+                            <LoginCredentials job={job}/>
+                        </Panel>
                         <Panel collapsible defaultExpanded header="Scrapy Stats">
                             <JobStats job={job} />
                         </Panel>

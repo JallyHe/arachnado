@@ -8,6 +8,7 @@ from arachnado.utils import json_encode
 from arachnado.spider import create_crawler
 from arachnado.monitor import Monitor
 from arachnado.handler_utils import ApiHandler, NoEtagsMixin
+from arachnado.extensions.login import login_credentials_changed
 
 at_root = lambda *args: os.path.join(os.path.dirname(__file__), *args)
 
@@ -20,13 +21,14 @@ def get_application(crawler_process, opts):
     debug = opts['arachnado']['debug']
 
     handlers = [
-        url(r"/", Index, context , name="index"),
+        url(r"/", Index, context, name="index"),
         url(r"/help", Help, context, name="help"),
         url(r"/crawler/start", StartCrawler, context, name="start"),
         url(r"/crawler/stop", StopCrawler, context, name="stop"),
         url(r"/crawler/pause", PauseCrawler, context, name="pause"),
         url(r"/crawler/resume", ResumeCrawler, context, name="resume"),
         url(r"/crawler/status", CrawlerStatus, context, name="status"),
+        url(r"/spider/login", SetLoginCredentials, context, name="login"),
         url(r"/ws-updates", Monitor, context, name="ws"),
     ]
     return Application(
@@ -95,7 +97,7 @@ class StartCrawler(ApiHandler, BaseRequestHandler):
 
 
 class _ControlJobHandler(ApiHandler, BaseRequestHandler):
-    def control_job(self, job_id):
+    def control_job(self, job_id, **kwargs):
         raise NotImplementedError
 
     def post(self):
@@ -140,3 +142,17 @@ class CrawlerStatus(BaseRequestHandler):
                     if job['id'] in crawl_ids]
 
         self.write(json_encode({"jobs": jobs}))
+
+
+class SetLoginCredentials(ApiHandler, BaseRequestHandler):
+    """ This method changes job's username and password and restarts
+    it if needed """
+    def post(self):
+        job_id = int(self.json_args['job_id'])
+        crawler = self.crawler_process.get_crawler(job_id)
+        crawler.signals.send_catch_log(
+            login_credentials_changed,
+            spider=crawler.spider,
+            username=self.json_args['username'],
+            password=self.json_args['password'],
+        )

@@ -46,7 +46,13 @@ DEFAULT_SETTINGS = {
         'arachnado.motor_exporter.pipelines.MotorPipeline': 100,
     },
 
+    'DOWNLOADER_MIDDLEWARES': {
+        'arachnado.extensions.login.Login': 10,
+    },
+
     'MOTOR_PIPELINE_JOBID_KEY': '_job_id',
+
+    'LOGIN_ENABLED': True,
 }
 
 
@@ -66,10 +72,13 @@ class CrawlWebsiteSpider(scrapy.Spider):
     crawl_id = None
     domain = None
     motor_job_id = None
+    flags = None
+    login_form_response = None
 
     def __init__(self, *args, **kwargs):
         super(CrawlWebsiteSpider, self).__init__(*args, **kwargs)
         self.start_url = add_scheme_if_missing(self.domain)
+        self.flags = set()
 
         # don't log scraped items
         logging.getLogger("scrapy.core.scraper").setLevel(logging.INFO)
